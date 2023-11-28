@@ -160,8 +160,9 @@ class MainActivity : ComponentActivity() {
 
                                 Spacer(modifier = Modifier.height(32.dp))
 
-                                Text(text = "好用请点击下方链接给个 star 吧，各位美女帅哥！")
+                                Text(text = "好用请点击下方链接给个 star 吧！")
                                 LinkText(text = "Power By Wilinz: https://github.com/wilinz/FuckKetangpai", url = "https://github.com/wilinz/FuckKetangpai")
+                                Text(text = "后续如果出现无法使用请前往 Github 下载最新版本")
                             }
                         }
                     }
