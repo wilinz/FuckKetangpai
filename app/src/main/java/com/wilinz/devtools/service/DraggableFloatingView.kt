@@ -58,6 +58,7 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.wilinz.devtools.R
+import com.wilinz.devtools.ui.theme.DevtoolsTheme
 import com.wilinz.devtools.util.copyToClipboard
 import com.wilinz.devtools.util.toast
 import kotlinx.coroutines.delay
@@ -157,81 +158,83 @@ class DraggableFloatingView(
             ViewConfiguration.get(context).scaledTouchSlop // Threshold for considering a touch as a drag
 
         floatingView.setContent {
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0x10000000))
+            DevtoolsTheme {
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0x10000000))
 
-            ) {
-                var minimization by remember {
-                    mutableStateOf(false)
-                }
-                var tip by remember {
-                    mutableStateOf("")
-                }
-
-                Column {
-                    val isLoading by isLoadingFlow.collectAsState()
-                    var isHide by remember {
+                ) {
+                    var minimization by remember {
                         mutableStateOf(false)
                     }
+                    var tip by remember {
+                        mutableStateOf("")
+                    }
 
-                    Row(
-                        modifier = Modifier
-                            .wrapContentSize(),
-//                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        if (!isHide) {
-                            IconButton(onClick = {
-                                if (!isLoading) onStartCallback?.invoke()
-                            }) {
-                                Icon(
-                                    if (isLoading) Icons.Default.Sync else Icons.Default.PlayArrow,
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                            }
-//                        Spacer(modifier = Modifier.weight(1f))
-                            IconButton(onClick = { minimization = !minimization }) {
-                                Icon(
-                                    painterResource(id = if (minimization) R.drawable.maximization else R.drawable.minimization),
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                            }
+                    Column {
+                        val isLoading by isLoadingFlow.collectAsState()
+                        var isHide by remember {
+                            mutableStateOf(false)
                         }
 
-
-                        DragTheButton(threshold, onClick = {
-                            isHide = !isHide
-                        })
-                    }
-                    val answer by answerFlow.collectAsState()
-                    val context = LocalContext.current
-
-                    if (!isHide && !minimization && (answer.isNotBlank() || isLoading || tip.isNotBlank())) {
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .wrapContentSize()
-                                .padding(8.dp, 0.dp, 8.dp, 8.dp),
+                                .wrapContentSize(),
+                            //                            .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (isLoading) {
-                                Text(text = "正在获取...")
+
+                            if (!isHide) {
+                                IconButton(onClick = {
+                                    if (!isLoading) onStartCallback?.invoke()
+                                }) {
+                                    Icon(
+                                        if (isLoading) Icons.Default.Sync else Icons.Default.PlayArrow,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
+                                //                        Spacer(modifier = Modifier.weight(1f))
+                                IconButton(onClick = { minimization = !minimization }) {
+                                    Icon(
+                                        painterResource(id = if (minimization) R.drawable.maximization else R.drawable.minimization),
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
                             }
-                            if (tip.isNotBlank()) {
-                                Text(text = tip)
-                            }
-                            if (answer.isNotBlank()) {
-                                Text(text = answer, modifier = Modifier.clickable {
-                                    copyToClipboard(context, answer)
-                                })
+
+
+                            DragTheButton(threshold, onClick = {
+                                isHide = !isHide
+                            })
+                        }
+                        val answer by answerFlow.collectAsState()
+                        val context = LocalContext.current
+
+                        if (!isHide && !minimization && (answer.isNotBlank() || isLoading || tip.isNotBlank())) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(8.dp, 0.dp, 8.dp, 8.dp),
+                            ) {
+                                if (isLoading) {
+                                    Text(text = "正在获取...")
+                                }
+                                if (tip.isNotBlank()) {
+                                    Text(text = tip)
+                                }
+                                if (answer.isNotBlank()) {
+                                    Text(text = answer, modifier = Modifier.clickable {
+                                        copyToClipboard(context, answer)
+                                    })
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
             }
         }

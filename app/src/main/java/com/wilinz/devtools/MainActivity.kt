@@ -6,16 +6,24 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,8 +33,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -68,7 +80,8 @@ class MainActivity : ComponentActivity() {
                         Column(
                             Modifier
                                 .padding(it)
-                                .fillMaxSize(),
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
 
@@ -144,6 +157,11 @@ class MainActivity : ComponentActivity() {
                                 }) {
                                     Text(text = "启动！！！")
                                 }
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                Text(text = "好用请点击下方链接给个 star 吧，各位美女帅哥！")
+                                LinkText(text = "Power By Wilinz: https://github.com/wilinz/FuckKetangpai", url = "https://github.com/wilinz/FuckKetangpai")
                             }
                         }
                     }
@@ -151,6 +169,32 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    @Composable
+    fun LinkText(text: String, url: String) {
+        val context = LocalContext.current
+        val annotatedString = AnnotatedString.Builder(text).apply {
+            addStyle(
+                style = SpanStyle(
+                    textDecoration = TextDecoration.Underline
+                ),
+                start = 0,
+                end = text.length
+            )
+        }.toAnnotatedString()
+
+        Text(
+            text = annotatedString,
+            modifier = Modifier.clickable {
+                // 使用CustomTabsIntent打开链接
+//                val customTabsIntent = CustomTabsIntent.Builder().build()
+//                customTabsIntent.launchUrl(context, url.toUri())
+                // 使用标准的Intent打开链接
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(intent)
+            }
+        )
     }
 
     fun startCompatibleForegroundService(context: Context, intent: Intent) {
