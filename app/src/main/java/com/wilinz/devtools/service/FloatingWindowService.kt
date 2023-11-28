@@ -17,8 +17,8 @@ import com.aallam.openai.api.chat.ChatResponseFormat
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.model.ModelId
 import com.wilinz.devtools.data.Network
-import com.wilinz.devtools.data.Question
-import com.wilinz.devtools.data.YanxiQuestionBankRequest
+import com.wilinz.devtools.data.model.Question
+import com.wilinz.devtools.data.model.YanxiQuestionBankRequest
 import com.wilinz.devtools.data.moshi
 import com.wilinz.devtools.data.repository.YanxiRepository
 import com.wilinz.devtools.util.toast

@@ -1,4 +1,4 @@
-package com.wilinz.devtools.data
+package com.wilinz.devtools.data.model
 import com.squareup.moshi.Json
 
 data class Question(
