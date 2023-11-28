@@ -151,6 +151,18 @@ class MainActivity : ComponentActivity() {
                                     Text(text = "打开悬浮窗")
                                 }
 
+                                ElevatedButton(modifier = Modifier.fillMaxWidth(), onClick = {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        if (Settings.canDrawOverlays(context)){
+                                            toast("你已经有悬浮窗权限")
+                                        }
+                                        startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+                                    }else{
+                                        toast("你已经有悬浮窗权限")
+                                    }
+                                }) {
+                                    Text(text = "悬浮窗权限设置")
+                                }
 
                                 ElevatedButton(modifier = Modifier.fillMaxWidth(), onClick = {
                                     if (checkEnv(context)) launchAppPackage("com.tencent.mm")

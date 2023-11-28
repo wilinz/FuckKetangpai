@@ -25,6 +25,7 @@ import com.wilinz.devtools.util.toast
 import fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -122,36 +123,61 @@ class FloatingWindowService : SavedStateLifecycleService() {
         val result =
             completion.choices.firstOrNull()?.message?.content ?: throw Exception("提取题目失败")
 
-        Log.d("openaiHandle: ", result)
+        val question: Question = moshi.fromJson<Question>(result) ?: throw Exception("提取题目失败")
 
-        val question = moshi.fromJson<Question>(result) ?: throw Exception("提取题目失败")
-        val yanxi = YanxiRepository.get(
-            YanxiQuestionBankRequest(
-                token = "585f14c167d24e649748da25ac8d51e6",
-                title = question.question,
-                options = question.options.joinToString(separator = "\n") {
-                    if (it.content != null) {
-                        "${it.option}. ${it.content}"
-                    } else {
-                        it.option
-                    }
-                }
-            )
-        )
+        //
+        val result1 = async {
+            try {
+                val question1 = question.copy(answers = listOf(), answersText = "")
+                val chatCompletionRequest1 = ChatCompletionRequest(
+                    model = ModelId("gpt-3.5-turbo"),
+                    messages = listOf(
+                        ChatMessage(
+                            role = ChatRole.System,
+                            content = "我是问答小助手"
+                        ),
+                        ChatMessage(
+                            role = ChatRole.User,
+                            content = "请回答问题：${moshi.toJson(question1)}"
+                        )
+                    ),
+                )
+                val completion1 = Network.openAI.chatCompletion(chatCompletionRequest1)
+                completion1.choices.firstOrNull()?.message?.content
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
 
-        Log.d("openaiHandle: ", moshi.toJson(yanxi))
+        val answer = async {
+            try {
+                val yanxi = YanxiRepository.get(
+                    YanxiQuestionBankRequest(
+                        token = "585f14c167d24e649748da25ac8d51e6",
+                        title = question.question,
+                        options = question.options.joinToString(separator = "\n") {
+                            if (it.content != null) {
+                                "${it.option}. ${it.content}"
+                            } else {
+                                it.option
+                            }
+                        }
+                    )
+                )
 
-        val answer =
-            yanxi.data.results.map {
-                "--问题：" + it.question.trim() + "\n答案：" + it.answer.trim().replace("#", "\n")
-            }.joinToString("\n")
+                yanxi.data.results.map {
+                    "--问题：" + it.question.trim() + "\n答案：" + it.answer.trim().replace("#", "\n")
+                }.joinToString("\n")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
 //        sendNotification("题库答案：", )
         answerFlow.emit(
-            "题库答案：\n$answer\nAi答案（不一定对）：${
-                question.answers.joinToString(
-                    separator = ","
-                ) { it.trim() }
-            }; ${question.answersText.trim()}"
+            "题库答案：\n${answer.await()}\nAi答案（不一定对）：${result1.await()}"
         )
     }
 
