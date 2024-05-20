@@ -3,6 +3,7 @@
 package com.wilinz.devtools
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -58,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
     val ipv4Regex = Regex("""^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$""")
 
+    @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -143,8 +145,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                     } else {
-                                        val intent =
-                                            PermissionsSettingUtil.getAppPermissionsSettingIntent()
+                                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                                         startActivity(intent)
                                     }
                                 }) {

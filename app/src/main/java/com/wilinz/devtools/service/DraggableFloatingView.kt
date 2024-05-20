@@ -159,25 +159,27 @@ class DraggableFloatingView(
 
         floatingView.setContent {
             DevtoolsTheme {
+                var isHide by remember {
+                    mutableStateOf(false)
+                }
+                var minimization by remember {
+                    mutableStateOf(false)
+                }
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0x10000000))
+                        .background(Color(if (isHide || minimization) 0x05000000 else 0x50000000 ))
 
                 ) {
-                    var minimization by remember {
-                        mutableStateOf(false)
-                    }
+
                     var tip by remember {
                         mutableStateOf("")
                     }
 
                     Column {
                         val isLoading by isLoadingFlow.collectAsState()
-                        var isHide by remember {
-                            mutableStateOf(false)
-                        }
+
 
                         Row(
                             modifier = Modifier
@@ -221,13 +223,13 @@ class DraggableFloatingView(
                                     .padding(8.dp, 0.dp, 8.dp, 8.dp),
                             ) {
                                 if (isLoading) {
-                                    Text(text = "正在获取...")
+                                    Text(text = "正在获取...", color = Color.White)
                                 }
                                 if (tip.isNotBlank()) {
-                                    Text(text = tip)
+                                    Text(text = tip, color = Color.White)
                                 }
                                 if (answer.isNotBlank()) {
-                                    Text(text = answer, modifier = Modifier.clickable {
+                                    Text(text = answer, color = Color.White, modifier = Modifier.clickable {
                                         copyToClipboard(context, answer)
                                     })
                                 }
@@ -297,7 +299,7 @@ class DraggableFloatingView(
         ) {
             CircularIconButton(
                 icon = Icons.Default.PlayArrow,
-                backgroundColor = Color(0x10000000),
+                backgroundColor = Color(0x05000000),
                 interactionSource = interactionSource // 传递 interactionSource
             )
         }

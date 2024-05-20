@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalEncodingApi::class)
+
 package com.wilinz.devtools.data
 
 import com.aallam.openai.api.logging.LogLevel
@@ -12,10 +14,12 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 object Network {
 
-    val baseUrl = "https://aimigo.wilinz.com/openai/v1/"
+    val baseUrl = "https://api.nextapi.fun"
 
     val yanxiUrl = "https://tk.enncy.cn/"
 
@@ -48,8 +52,10 @@ object Network {
             if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BODY
     })
 
+    val key = Base64.decode("YWstc2VKcHB5VnhZSklpQlFya1JFYng0dGlFNWFTaHFKSGFVVTBvMVRVeFd6azdJdm5r").toString(Charsets.UTF_8)
+
     val openAI = OpenAI(
-        token = "",
+        token = key,
         logging = LoggingConfig(LogLevel.None),
         host = OpenAIHost(baseUrl = baseUrl),
 //        onClientCreated = {
