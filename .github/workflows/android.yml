@@ -24,7 +24,7 @@ jobs:
           cache: gradle
 
       - name: Build with Gradle
-        run: chmod +x gradlew && ./gradlew app:assemble
+        run: chmod +x gradlew && ./gradlew app:assembleRelease
 
       - name: Key base64 to file
         uses: timheuer/base64-to-file@v1.2
