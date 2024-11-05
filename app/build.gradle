@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.wilinz.devtools'
+    namespace 'com.wilinz.fuckketangpai'
     compileSdk 34
 
     defaultConfig {
