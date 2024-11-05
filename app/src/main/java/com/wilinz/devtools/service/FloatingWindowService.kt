@@ -3,6 +3,7 @@ package com.wilinz.devtools.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -32,6 +33,10 @@ import kotlinx.coroutines.withContext
 import toJson
 
 class FloatingWindowService : SavedStateLifecycleService() {
+
+    companion object{
+        const val ACTION_STOP_SERVICE = "com.wilinz.devtools.service.action.STOP_SERVICE"
+    }
 
     private var draggableFloatingView: DraggableFloatingView? = null
     private val auto get() = AutoAccessibilityService.instance
@@ -101,6 +106,9 @@ class FloatingWindowService : SavedStateLifecycleService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP_SERVICE) {
+            stopSelf() // Stop the service when the button is pressed
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -130,7 +138,7 @@ class FloatingWindowService : SavedStateLifecycleService() {
             try {
                 val question1 = question.copy(answers = listOf(), answersText = "")
                 val chatCompletionRequest1 = ChatCompletionRequest(
-                    model = ModelId("gpt-3.5-turbo"),
+                    model = ModelId("gpt-4o-mini"),
                     messages = listOf(
                         ChatMessage(
                             role = ChatRole.System,
@@ -233,23 +241,33 @@ class FloatingWindowService : SavedStateLifecycleService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Fucking Ketangpai",
+                "Floating Service Channel",
                 NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        // Intent to stop the service
+        val stopIntent = Intent(this, FloatingWindowService::class.java).apply {
+            action = ACTION_STOP_SERVICE
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .addAction(
+                android.R.drawable.ic_delete, // Icon for the button
+                "停止运行", // Label for the button
+                stopPendingIntent
+            )
             .build()
-
-        return notification
     }
-
     override fun onDestroy() {
         super.onDestroy()
         draggableFloatingView?.remove()
