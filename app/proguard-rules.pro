@@ -29,4 +29,4 @@
     @com.squareup.moshi.ToJson *;
 }
 
--keep class com.wilinz.devtools.data.model.** {*;}
+-keep class com.wilinz.fuckketangpai.data.model.** {*;}
